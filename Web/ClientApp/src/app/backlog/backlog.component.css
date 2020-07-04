@@ -1,0 +1,12 @@
+.card-dv{
+    margin-top: 5px;
+    
+}
+
+.card{
+    background: #5d7de7;
+}
+.card-dv span:nth-child(2){
+    float: right;
+   
+}

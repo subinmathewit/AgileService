@@ -1,4 +1,5 @@
-﻿using AgileDashBoardService.Entities;
+﻿using AgileDashBoardService.Data.DB;
+using AgileDashBoardService.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace AgileDashBoardService.BL.Interfaces
     public interface IStoryService
     {
         public Task<long> AddStoryAsync(Story story);
-        public List<Story> GetAutoSelectedStoriesAsync(int storyPoint );
+        public List<Stories> GetAutoSelectedStoriesAsync(int storyPoint );
+        public List<Stories> GetAll();
+        public int RemoveAllStories();
     }
 }

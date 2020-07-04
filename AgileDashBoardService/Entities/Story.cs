@@ -7,7 +7,8 @@ namespace AgileDashBoardService.Entities
 {
     public class Story
     {
+        public long Id { get; set; }
         public string StoryName { get; set; }
-        public int StoryPoints { get; set; }
+        public int StoryPoint { get; set; }
     }
 }

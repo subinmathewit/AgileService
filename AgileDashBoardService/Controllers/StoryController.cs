@@ -47,7 +47,7 @@ namespace AgileDashBoardService.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AutoSelect(int storyPoint)
+        public IActionResult GetAutoSelect(int storyPoint)
         {
             try
             {
@@ -57,6 +57,46 @@ namespace AgileDashBoardService.Controllers
 
 
                
+            }
+
+            catch (Exception ex)
+            {
+                this._logger.LogError("Exception occured at Story Controller at Add Story");
+                throw;
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            try
+            {
+
+                var lst = this._storyService.GetAll();
+                return Ok(lst);
+
+
+
+            }
+
+            catch (Exception ex)
+            {
+                this._logger.LogError("Exception occured at Story Controller at Add Story");
+                throw;
+            }
+        }
+
+        [HttpDelete]
+        public IActionResult RemoveAll()
+        {
+            try
+            {
+
+                
+                return Ok(this._storyService.RemoveAllStories());
+
+
+
             }
 
             catch (Exception ex)

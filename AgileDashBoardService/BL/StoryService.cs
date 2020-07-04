@@ -24,12 +24,12 @@ namespace AgileDashBoardService.BL
         {
             try
             {
-                if (!string.IsNullOrEmpty(story.StoryName) && story.StoryPoints > 0)
+                if (!string.IsNullOrEmpty(story.StoryName) && story.StoryPoint > 0)
                 {
                     Stories st = new Stories()
                     {
                         StoryName = story.StoryName,
-                        StoryPoint = story.StoryPoints
+                        StoryPoint = story.StoryPoint
                     };
 
 
@@ -48,53 +48,56 @@ namespace AgileDashBoardService.BL
             return Convert.ToInt64(0);
         }
 
-        public List<Story> GetAutoSelectedStoriesAsync(int storyPoint)
+        public List<Stories> GetAll()
         {
             try
             {
-                List<Story> lstStories = new List<Story>();
-                var stories = this._unitofWork.StoriesRepository.FindAll(i =>i.StoryPoint<=storyPoint).OrderBy(i => i.StoryPoint).ToList();
+                return this._unitofWork.StoriesRepository.FindAll().ToList();
+            }
+            catch(Exception ex)
+            {
+                this._logger.LogError("Exception occured at Story Service GetAll");
+                throw;
+            }
+        }
+
+        public List<Stories> GetAutoSelectedStoriesAsync(int storyPoint)
+        {
+            try
+            {
+                List<Stories> lstStories = new List<Stories>();
+                lstStories = this._unitofWork.StoriesRepository.FindAll(i =>i.StoryPoint<=storyPoint).OrderBy(i => i.StoryPoint).ToList();
                 int maxsum = 0;
-                long a = 0, b = 0;
-                for (int i = 0; i < stories.Count; i++)
-                {
-                    for (int j = i + 1; j < stories.Count; j++)
-                    {
-                        var val = stories[i].StoryPoint + stories[j].StoryPoint;
-                        if (val <= storyPoint && val > maxsum)
-                        {
-                            maxsum = val;
-                            a = i;
-                            b = j;
-                        }
-                    }
-                }
+                long? a=null , b=null;
 
-                if (a > 0)
+                int sum = lstStories.Sum(i => i.StoryPoint);
+                while (sum > storyPoint)
                 {
-                    int firsPair = Convert.ToInt32(a);
-                    var firstStory = stories[firsPair];
-                    lstStories.Add(new Story(){
-                        StoryName= firstStory.StoryName,
-                        StoryPoints= firstStory.StoryPoint
-                    });
+                    var maxValue = lstStories.Max(i => i.StoryPoint);
+                    lstStories.Remove(lstStories.Find(i => i.StoryPoint == maxValue));
+                    sum = lstStories.Sum(i => i.StoryPoint);
                 }
-                if (b > 0)
-                {
-                    int secPair = Convert.ToInt32(b);
-                    var secondStory = stories[secPair];
-                    lstStories.Add(new Story()
-                    {
-                        StoryName = secondStory.StoryName,
-                        StoryPoints = secondStory.StoryPoint
-                    });
-                }
-
+              
                 return lstStories;
             }
             catch (Exception ex)
             {
                 this._logger.LogError("Exception occured at Story Service at Auto Select Stories");
+                throw;
+            }
+        }
+
+        public int RemoveAllStories()
+        {
+           try
+            {
+                var stories = this._unitofWork.StoriesRepository.FindAll().ToList();
+                this._unitofWork.StoriesRepository.RemoveRange(stories);
+                return this._unitofWork.Complete();
+            }
+            catch(Exception ex)
+            {
+                this._logger.LogError("Exception occured at Story Service at RemoveAllStories");
                 throw;
             }
         }

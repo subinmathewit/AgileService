@@ -3,6 +3,7 @@ using AgileDashBoardService.BL.Interfaces;
 using AgileDashBoardService.Data.DB;
 using AgileDashBoardService.Data.UnitofWork;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +14,7 @@ namespace AgileDashBoardService
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration)
         {
@@ -22,10 +24,10 @@ namespace AgileDashBoardService
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddControllers();
-            services.AddDbContext<AgileDbContext>(options =>
-         options.UseSqlServer(Configuration.GetConnectionString("AgileDb")));
-            //services.AddDbContext<AgileDbContext>(options => options.UseInMemoryDatabase("AgileDb"));
+            services.AddCors(AddCorsConfiguration);
+            services.AddDbContext<AgileDbContext>(options => options.UseInMemoryDatabase("AgileDb"));
 
             services.AddScoped<IUnitofWork, UnitofWork>();
             services.AddScoped<IStoryService,StoryService>();
@@ -40,11 +42,25 @@ namespace AgileDashBoardService
             }
 
             app.UseRouting();
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void AddCorsConfiguration(CorsOptions corsOptions)
+        {
+            corsOptions.AddPolicy(MyAllowSpecificOrigins,
+                builder =>
+                {
+                    builder.AllowAnyOrigin();
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+
+
+                });
         }
     }
 }
